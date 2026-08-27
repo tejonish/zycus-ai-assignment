@@ -1,0 +1,26 @@
+[
+  {
+    "query": "How do I enable SSO?",
+    "expected_source": "troubleshooting\\authentication-sso.md"
+  },
+  {
+    "query": "Users are unable to sync files",
+    "expected_source": "products\\cloudsync.md"
+  },
+  {
+    "query": "How much does the Business plan cost?",
+    "expected_source": "billing\\billing-and-plans.md"
+  },
+  {
+    "query": "WorkflowEngine approval is stuck",
+    "expected_source": "products\\workflowengine.md"
+  },
+  {
+    "query": "DataBridge Pro ingestion is failing",
+    "expected_source": "products\\databridge-pro.md"
+  },
+  {
+    "query": "CloudSync webhook is not reaching Snowflake",
+    "expected_source": "troubleshooting\\performance-and-integrations.md"
+  }
+]
