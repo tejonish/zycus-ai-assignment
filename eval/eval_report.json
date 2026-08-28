@@ -1,0 +1,123 @@
+{
+  "retrieval": [
+    {
+      "query": "How do I enable SSO?",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "Expected source found at rank 1."
+    },
+    {
+      "query": "Users are unable to sync files",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "Expected source found at rank 1."
+    },
+    {
+      "query": "How much does the Business plan cost?",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "Expected source found at rank 1."
+    },
+    {
+      "query": "WorkflowEngine approval is stuck",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "Expected source found at rank 1."
+    },
+    {
+      "query": "DataBridge Pro ingestion is failing",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "Expected source found at rank 1."
+    },
+    {
+      "query": "CloudSync webhook is not reaching Snowflake",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "Expected source found at rank 1."
+    }
+  ],
+  "task_1_triage": [
+    {
+      "name": "SSO setup",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "3/3 acceptance criteria passed."
+    },
+    {
+      "name": "CloudSync file sync failure",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "3/3 acceptance criteria passed."
+    },
+    {
+      "name": "Business plan pricing",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "3/3 acceptance criteria passed."
+    },
+    {
+      "name": "Workflow approval stuck",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "3/3 acceptance criteria passed."
+    },
+    {
+      "name": "DataBridge ingestion failure",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "3/3 acceptance criteria passed."
+    },
+    {
+      "name": "Ambiguous support request",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "2/2 acceptance criteria passed."
+    }
+  ],
+  "task_2_account_health": [
+    {
+      "name": "At-risk business account",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "6/6 acceptance criteria passed."
+    },
+    {
+      "name": "Account with recent ticket",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "1/1 acceptance criteria passed."
+    },
+    {
+      "name": "Account with recent support history",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "1/1 acceptance criteria passed."
+    },
+    {
+      "name": "Account with ticket history",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "1/1 acceptance criteria passed."
+    },
+    {
+      "name": "Valid account health lookup",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "3/3 acceptance criteria passed."
+    },
+    {
+      "name": "Adversarial unknown account",
+      "status": "PASS",
+      "score": 1.0,
+      "details": "Unknown account was correctly rejected."
+    }
+  ],
+  "summary": {
+    "total_cases": 18,
+    "passed": 18,
+    "failed": 0,
+    "pass_rate": 1.0,
+    "quality_score": 1.0
+  }
+}

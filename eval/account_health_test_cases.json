@@ -1,0 +1,38 @@
+[
+  {
+    "name": "At-risk business account",
+    "account_id": "ACC-3336",
+    "company": "Omni Consumer Products",
+    "health_status": "At Risk",
+    "usage_trend": "Inactive",
+    "min_ticket_count": 1,
+    "requires_churn_flag": true,
+    "requires_escalation_flag": true
+  },
+  {
+    "name": "Account with recent ticket",
+    "account_id": "ACC-1785",
+    "min_ticket_count": 1
+  },
+  {
+    "name": "Account with recent support history",
+    "account_id": "ACC-5748",
+    "min_ticket_count": 1
+  },
+  {
+    "name": "Account with ticket history",
+    "account_id": "ACC-7397",
+    "min_ticket_count": 1
+  },
+  {
+    "name": "Valid account health lookup",
+    "account_id": "ACC-3336",
+    "company": "Omni Consumer Products",
+    "health_status": "At Risk",
+    "usage_trend": "Inactive"
+  },
+  {
+    "name": "Adversarial unknown account",
+    "account_id": "ACC-DOES-NOT-EXIST"
+  }
+]

@@ -1,96 +1,158 @@
 ````markdown
 # Zycus AI Support Ticket Triage
-
 ## Overview
-
-This project implements an AI-assisted support ticket triage system for analyzing customer support tickets, retrieving relevant knowledge-base information, generating draft responses, and summarizing account health.
-
-The system:
-
-- Loads support knowledge-base documents
-- Splits documents into searchable sections
-- Uses TF-IDF vectorization for text representation
-- Uses cosine similarity for knowledge-base retrieval
-- Retrieves relevant knowledge-base content for support tickets
-- Classifies tickets into support categories
-- Assigns ticket urgency
-- Generates ticket summaries
-- Generates draft support replies
-- Returns relevant knowledge-base sources
-- Calculates retrieval confidence
-- Evaluates the retrieval system against predefined test cases
-- Generates account-level health summaries for TAM review
-
-## Features
-
-### 1. Knowledge Base Retrieval
-
-The retrieval pipeline reads Markdown knowledge-base documents from the `data/knowledge-base/` directory.
-
-Documents are:
-
-1. Loaded from the knowledge base
-2. Split into smaller searchable chunks
-3. Converted into TF-IDF vectors
-4. Compared against ticket text using cosine similarity
-5. Ranked based on relevance
-
-The system returns the most relevant knowledge-base sections for a given support ticket.
-
-### 2. Ticket Triage
-
-The ticket triage system analyzes support tickets and produces:
-
-- Ticket ID
-- Category
-- Urgency
-- Summary
-- Draft reply
-- Relevant KB sources
-- Confidence score
-
-The triage logic uses ticket information and retrieved knowledge-base content to determine an appropriate response.
-
-### 3. Account Health Summarization
-
-The account summarization component combines account information with available support ticket information.
-
-It provides:
-
-- Account summary
-- Company information
-- Plan tier
-- ARR
-- Licensed and active seats
-- Products
-- Health status
-- Usage trend
-- Open ticket count
-- High-priority ticket count
-- Churn risk indicators
-- Escalation indicators
-- Executive summary
+This project implements an AI-assisted support ticket triage system for analyzing customer support tickets, retrieving relevant knowledge-base information, generating grounded draft responses, and summarizing account health.
+The system combines deterministic logic with a local LLM running through Ollama.
+### Main capabilities
+- Knowledge-base document loading
+- Document chunking
+- TF-IDF based retrieval
+- Cosine similarity ranking
+- Retrieval confidence scoring
+- Ticket category classification
+- Ticket urgency classification
+- Ticket summarization
+- Grounded draft response generation
+- Local LLM integration using Ollama
+- Deterministic fallback when the LLM is unavailable
+- Account health analysis
+- Churn and escalation risk detection
 - TAM talking points
-- Recent ticket information
-
-The account health output is intended to help a TAM quickly understand customer risk and prioritize follow-up actions.
-
+- Automated tests
+- End-to-end evaluation
+---
+## Architecture
+```text
+                    Support Ticket
+                          |
+                          v
+                +-------------------+
+                |  KB Retrieval     |
+                | TF-IDF + Cosine   |
+                +---------+---------+
+                          |
+                          v
+                Relevant KB Context
+                          |
+             +------------+------------+
+             |                         |
+             v                         v
+     Deterministic Logic        Local LLM (Ollama)
+     Category + Urgency         Draft Response
+             |                   Generation
+             |                         |
+             +------------+------------+
+                          |
+                          v
+                   Final Triage
+                     Result
+             Account Health Workflow
+ Account Data + Ticket History
+              |
+              v
+      Account Health Logic
+              |
+              +--> Open Risks
+              +--> Churn Flags
+              +--> Escalation Flags
+              +--> Executive Summary
+              +--> TAM Talking Points
+````
+---
+## Features
+### 1. Knowledge Base Retrieval
+The retrieval pipeline reads Markdown knowledge-base documents from:
+```text
+data/knowledge-base/
+```
+Documents are:
+1. Loaded from the knowledge base
+2. Split into searchable sections
+3. Converted into TF-IDF vectors
+4. Compared against the query using cosine similarity
+5. Ranked according to relevance
+The system returns the most relevant knowledge-base sections and their source files.
+---
+### 2. Ticket Triage
+The ticket triage system produces:
+* Ticket ID
+* Category
+* Urgency
+* Summary
+* Draft reply
+* Relevant KB sources
+* Confidence score
+Example:
+```json
+{
+  "ticket_id": "TKT-10499",
+  "category": "How-To",
+  "urgency": "P4",
+  "summary": "New team member onboarding to SecureVault",
+  "draft_reply": "Thanks for reaching out...",
+  "kb_sources": [
+    "onboarding\\onboarding-guide.md",
+    "products\\securevault.md"
+  ],
+  "confidence": 0.65
+}
+```
+---
+### 3. Local LLM Integration
+The project uses **Ollama** for local language-model generation.
+Current model:
+```text
+llama3.2:3b
+```
+The LLM is used primarily for natural-language response generation while deterministic logic continues to provide stable ticket classification and urgency assignment.
+This design provides:
+* Local execution
+* No external API dependency for normal operation
+* Reproducible classification
+* Grounded response generation
+* Graceful fallback when Ollama is unavailable
+The LLM receives ticket information and retrieved knowledge-base context so that generated replies remain grounded in the supplied documentation.
+---
+### 4. LLM Fallback
+If the Ollama model is unavailable, the system falls back to deterministic response generation.
+This means the application can still operate without the local LLM service.
+The fallback also prevents an LLM failure from breaking the overall ticket-triage workflow.
+---
+### 5. Account Health Summarization
+The account health component combines account information with available support-ticket history.
+It provides:
+* Account ID
+* Company information
+* Plan tier
+* ARR
+* Licensed seats
+* Active seats
+* Products
+* Health status
+* Usage trend
+* Open ticket count
+* High-priority ticket count
+* Churn indicators
+* Escalation indicators
+* Executive summary
+* TAM talking points
+* Recent tickets
+The account health output is designed to help a TAM quickly understand customer risk and prioritize follow-up actions.
+---
 ## Technology
-
-The current implementation uses:
-
-- Python
-- scikit-learn
-- TF-IDF vectorization
-- Cosine similarity
-- pytest
-- JSON
-- Markdown knowledge-base documents
-
-No external LLM or OpenAI API key is required for the current implementation.
-
+The project uses:
+* Python
+* Streamlit
+* scikit-learn
+* TF-IDF
+* Cosine similarity
+* Ollama
+* Llama 3.2 3B
+* pytest
+* JSON
+* Markdown
+---
 ## Project Structure
-
 ```text
 zycus-ai-assignment/
 │
@@ -118,77 +180,120 @@ zycus-ai-assignment/
 │
 ├── eval/
 │   ├── evaluate.py
-│   └── test_cases.json
+│   ├── test_cases.json
+│   └── triage_test_cases.json
 │
 ├── src/
-│   ├── __init__.py
-│   │
 │   ├── retrieval/
 │   │   ├── __init__.py
 │   │   ├── chunker.py
-│   │   ├── retriever.py
-│   │   └── test_ticket_retrieval.py
+│   │   └── retriever.py
+│   │
+│   ├── triage/
+│   │   ├── __init__.py
+│   │   └── triage.py
 │   │
 │   ├── summarizer/
 │   │   ├── __init__.py
 │   │   └── summarizer.py
 │   │
-│   └── triage/
-│       ├── __init__.py
-│       └── triage.py
+│   └── llm/
+│       └── llm_client.py
 │
 ├── tests/
 │   ├── test_retrieval.py
 │   └── test_summarizer.py
 │
+├── app.py
+├── requirements.txt
 ├── .env.example
 ├── .gitignore
-├── inspect_data.py
-├── inspect_tickets.py
-├── requirements.txt
 └── README.md
-````
-
+```
+---
 ## Installation
-
-Create a Python virtual environment:
-
+Create a virtual environment:
 ```powershell
 python -m venv .venv
 ```
-
-Activate the environment on Windows PowerShell:
-
+Activate it:
 ```powershell
 .venv\Scripts\Activate.ps1
 ```
-
-Install the project dependencies:
-
+Install dependencies:
 ```powershell
 pip install -r requirements.txt
 ```
-
+---
+## Ollama Setup
+Install Ollama and verify that it is available:
+```powershell
+ollama --version
+```
+Check installed models:
+```powershell
+ollama list
+```
+The project uses:
+```text
+llama3.2:3b
+```
+If the model is not installed:
+```powershell
+ollama pull llama3.2:3b
+```
+Verify the model:
+```powershell
+ollama list
+```
+Test the model:
+```powershell
+python -c "import ollama; r=ollama.chat(model='llama3.2:3b', messages=[{'role':'user','content':'Reply with exactly: hello'}]); print(r['message']['content'])"
+```
+Expected output:
+```text
+hello
+```
+If Ollama is already running as a background service, there is no need to run `ollama serve` again.
+---
+## Running the Application
+Start the Streamlit application:
+```powershell
+streamlit run app.py
+```
+The application provides the following workflows:
+### Account Health
+Look up an account and generate:
+* Account overview
+* Executive summary
+* Open risks
+* Churn flags
+* Escalation flags
+* TAM talking points
+* Recent tickets
+### AI Support Ticket Triage
+Enter a support ticket to generate:
+* Category
+* Urgency
+* Confidence
+* Summary
+* Grounded draft response
+* KB sources
+### Knowledge Base Search
+Search the local documentation and inspect the most relevant retrieved sections.
+---
 ## Running Knowledge Base Retrieval
-
 From the project root:
-
 ```powershell
 python src\retrieval\retriever.py
 ```
-
-The retrieval component loads the knowledge base and performs similarity-based search against support ticket text.
-
+---
 ## Running Ticket Triage
-
 From the project root:
-
 ```powershell
 python src\triage\triage.py
 ```
-
 The output contains:
-
 * Ticket ID
 * Category
 * Urgency
@@ -196,200 +301,124 @@ The output contains:
 * Draft reply
 * KB sources
 * Confidence
-
-Example output structure:
-
-```json
-{
-  "ticket_id": "TKT-10499",
-  "category": "How-To",
-  "urgency": "P4",
-  "summary": "New team member onboarding to SecureVault",
-  "draft_reply": "Thanks for reaching out about New team member onboarding to SecureVault...",
-  "kb_sources": [
-    "onboarding\\onboarding-guide.md",
-    "products\\securevault.md"
-  ],
-  "confidence": 0.65
-}
-```
-
-## Running Account Health Summarization
-
+---
+## Running Account Health
 From the project root:
-
 ```powershell
 python src\summarizer\summarizer.py
 ```
-
-The summarizer loads account and ticket data and produces an account-level health summary.
-
-A specific account can also be tested using:
-
+A specific account can also be tested:
 ```powershell
 python -c "from src.summarizer.summarizer import build_account_health; import json; print(json.dumps(build_account_health('ACC-3336'), indent=2))"
 ```
-
-The account health result includes:
-
-* Account ID
-* Account summary
-* Executive summary
-* Open risks
-* Churn flags
-* Escalation flags
-* TAM talking points
-* Recent tickets
-
+---
 ## Running Tests
-
-Run the complete test suite from the project root:
-
+Run the complete automated test suite:
 ```powershell
 python -m pytest
 ```
-
-The current test suite covers:
-
+Current result:
+```text
+5 passed
+```
+The tests cover:
 * Knowledge-base retrieval
 * Ticket retrieval
 * Retrieval relevance
 * Account health summarization
-
-Current result:
-
-```text
-5 passed
-```
-
+---
 ## Running Evaluation
-
-The evaluation suite contains predefined support-ticket test cases.
-
 Run:
-
 ```powershell
 python eval\evaluate.py
 ```
-
-Current evaluation result:
-
+The evaluation covers both retrieval and application-level behavior.
+Current verified result:
 ```text
+=== Retrieval Evaluation ===
 PASS: How do I enable SSO?
 PASS: Users are unable to sync files
 PASS: How much does the Business plan cost?
 PASS: WorkflowEngine approval is stuck
 PASS: DataBridge Pro ingestion is failing
 PASS: CloudSync webhook is not reaching Snowflake
-
-Passed: 6/6
+=== Task 1: Ticket Triage ===
+PASS: SSO setup
+PASS: CloudSync file sync failure
+PASS: Business plan pricing
+PASS: Workflow approval stuck
+PASS: DataBridge ingestion failure
+PASS: Ambiguous support request
+=== Task 2: Account Health ===
+PASS: At-risk business account
+PASS: Account with recent ticket
+PASS: Account with recent support history
+PASS: Account with ticket history
+PASS: Valid account health lookup
+PASS: Adversarial unknown account
+=== Overall ===
+Passed: 18/18
+Failed: 0/18
+Pass rate: 1.00
+Quality score: 1.00
 ```
-
-## Evaluation Dataset
-
-The evaluation cases are stored in:
-
-```text
-eval/test_cases.json
-```
-
-The evaluation covers representative support scenarios including:
-
-* Authentication and SSO
-* Product synchronization
-* Billing and pricing
-* Workflow approvals
-* Data ingestion
-* CloudSync integrations
-
-The evaluation is intended to verify that the retrieval and triage pipeline identifies relevant knowledge-base content and produces appropriate results.
-
+---
 ## Retrieval Approach
-
-The retrieval pipeline uses a lightweight classical information-retrieval approach.
-
 ### Step 1: Document Loading
-
 Markdown knowledge-base files are loaded from:
-
 ```text
 data/knowledge-base/
 ```
-
 ### Step 2: Chunking
-
-Documents are divided into smaller sections so that retrieval can return focused information instead of entire documents.
-
+Documents are divided into smaller sections so retrieval can return focused information.
 ### Step 3: TF-IDF Vectorization
-
 Each knowledge-base chunk is converted into a TF-IDF vector.
-
-TF-IDF gives higher importance to terms that help distinguish relevant documents and sections.
-
 ### Step 4: Cosine Similarity
-
-The ticket query is converted into the same vector space.
-
-Cosine similarity is used to compare the ticket against the knowledge-base chunks.
-
-Higher similarity indicates stronger lexical relevance.
-
+The query is converted into the same vector space.
+Cosine similarity compares the query with knowledge-base chunks.
 ### Step 5: Ranking
-
-The retrieved chunks are ranked by similarity score and the most relevant sources are returned.
-
+Chunks are ranked by similarity and the most relevant sources are returned.
+---
 ## Confidence
-
-The confidence value is derived from the retrieval similarity results.
-
-A higher score indicates that the retrieved knowledge-base content is more closely related to the ticket.
-
-The confidence value should be interpreted as a retrieval relevance signal rather than a calibrated probability.
-
+The confidence value is derived from retrieval similarity results.
+It represents retrieval relevance rather than a calibrated probability.
+A higher value indicates stronger lexical similarity between the query and retrieved knowledge-base content.
+---
 ## Ticket Classification
-
-The triage component assigns a support category using information available in the ticket and relevant context.
-
+The triage component assigns a support category based on ticket information and relevant context.
 Example categories include:
-
 * Billing
-* Bug
+* Technical
 * How-To
 * Onboarding
 * Data Loss
 * Feature Request
-
+---
 ## Urgency
-
-Tickets are assigned an urgency level such as:
-
-* P1
-* P2
-* P3
-* P4
-
-Urgency is determined from information available in the ticket, including explicit priority indicators and the severity of the reported issue.
-
-## Draft Reply Generation
-
-The system generates a concise draft response using the ticket information and retrieved knowledge-base content.
-
-The draft response is designed to:
-
+Tickets are assigned one of:
+```text
+P1
+P2
+P3
+P4
+```
+Urgency is determined using information available in the ticket, including severity and explicit priority indicators.
+---
+## Grounded Draft Response Generation
+The response-generation pipeline uses retrieved knowledge-base content as context for the local LLM.
+The generated response is designed to:
 * Acknowledge the customer's issue
-* Reference relevant knowledge-base guidance
+* Use relevant KB information
 * Provide an appropriate next step
-* Avoid inventing unsupported troubleshooting information
-
+* Avoid unsupported troubleshooting claims
+* Avoid relying on information outside the available support context
+If Ollama is unavailable, deterministic fallback generation is used.
+---
 ## Account Health Logic
-
 The account health summarizer combines:
-
 1. Account-level information from `data/accounts.json`
 2. Available support-ticket information from `data/tickets.json`
-
 The summarizer identifies:
-
 * Current account health
 * Usage trend
 * Open ticket volume
@@ -397,107 +426,114 @@ The summarizer identifies:
 * Churn indicators
 * Escalation indicators
 * Recent support activity
-
 It then generates an executive summary and TAM talking points.
-
+---
 ## Data Handling
-
 The project uses the supplied account and ticket datasets.
-
-Account-level ticket counts and the tickets available in the ticket dataset may not always match.
-
+Account-level ticket counts and tickets available in the ticket dataset may not always match.
 The summarizer therefore distinguishes between:
-
 * Ticket counts stored on the account record
-* Tickets actually available for the account in the ticket dataset
+* Tickets available in the ticket dataset
 * Recent tickets included in the configured time window
-
 This prevents missing ticket records from automatically being interpreted as having no support activity.
-
+---
+## Design Decisions
+### Deterministic Classification
+Category and urgency classification remain deterministic so that the evaluation remains reproducible.
+### LLM-Assisted Generation
+The local LLM is used where natural-language generation provides value, particularly for customer-facing draft responses.
+### Retrieval-Grounded Generation
+The LLM receives relevant retrieved KB content rather than being asked to answer from unrestricted external knowledge.
+### Local Execution
+Ollama allows the LLM component to run locally without requiring an external API key.
+### Fallback Behavior
+If the LLM is unavailable, the system continues using deterministic generation.
+---
 ## Limitations
-
-The current implementation intentionally uses a lightweight retrieval and rule-based approach.
-
 Known limitations include:
-
 * TF-IDF primarily relies on lexical similarity
-* Semantically similar phrases with different wording may not always retrieve the best result
-* Confidence scores are retrieval scores and are not calibrated probabilities
-* Ticket classification is rule-based rather than model-based
-* Draft replies are template-driven
+* Semantically similar phrases with very different wording may not always retrieve the best result
+* Confidence scores are retrieval signals rather than calibrated probabilities
+* Classification remains deterministic
+* Local LLM quality depends on the selected Ollama model
 * Account and ticket datasets may contain inconsistent or incomplete relationships
-* The current implementation does not require an external LLM
-
+* The local 3B model may produce less sophisticated responses than larger hosted models
+---
 ## Future Improvements
-
 Potential improvements include:
-
-* Semantic embeddings for retrieval
-* Hybrid keyword and vector search
-* LLM-based ticket classification
-* LLM-based response generation
+* Semantic embeddings
+* Hybrid keyword and vector retrieval
+* Larger local LLM models
+* LLM-assisted ticket classification
 * Calibrated confidence scoring
-* Improved product and entity matching
+* Improved product/entity matching
 * More comprehensive evaluation metrics
 * Automated escalation detection
 * Historical account trend analysis
 * Account-level risk scoring
 * Integration with a production ticketing system
-
+---
 ## Reproducibility
-
-The project is designed to run locally using the supplied data and Python dependencies.
-
-After installing the requirements, the main verification commands are:
-
+The project is designed to run locally using the supplied data, Python dependencies, and Ollama.
+Main verification commands:
 ```powershell
 python -m pytest
 ```
-
 and:
-
 ```powershell
 python eval\evaluate.py
 ```
-
-The current implementation can therefore be evaluated without requiring external services or API credentials.
-
+The retrieval and deterministic components do not require an external API.
+The LLM response-generation component requires a locally running Ollama installation with the configured model available.
+---
 ## Verification
-
 The current implementation has been verified with:
-
 ```text
+pytest:
 5 passed
 ```
-
-for the automated test suite and:
-
+and:
 ```text
-Passed: 6/6
+evaluation:
+18/18 passed
+Pass rate: 1.00
+Quality score: 1.00
 ```
-
-for the evaluation suite.
-
+---
 ## Summary
-
-This project provides a lightweight AI-assisted support workflow that combines:
-
+This project provides a lightweight AI-assisted support workflow combining:
 * Knowledge-base retrieval
+* TF-IDF search
 * Ticket triage
+* Category classification
+* Urgency classification
 * Ticket summarization
-* Draft response generation
 * Retrieval confidence
-* Evaluation
-* Account health summarization
+* Grounded LLM response generation
+* Ollama local inference
+* Deterministic fallback
+* Account health analysis
+* Churn and escalation detection
 * TAM talking points
-
+* Automated testing
+* End-to-end evaluation
 The implementation focuses on being:
-
 * Simple
 * Reproducible
 * Explainable
 * Testable
+* Locally runnable
 * Easy to extend
-
-```
+````
+### Then save it
+In Notepad:
+**Ctrl + A → paste → Ctrl + S → close.**
+Then **don't change anything else yet**.
+Run:
+```powershell
+python -m pytest
+````
+and:
+```powershell
+python eval\evaluate.py
 ```

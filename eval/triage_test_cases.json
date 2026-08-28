@@ -1,0 +1,61 @@
+[
+  {
+    "name": "SSO setup",
+    "ticket": {
+      "subject": "How do I enable SSO?",
+      "body": "We need help enabling SSO for our organization."
+    },
+    "category": "How-To",
+    "urgency": "P4",
+    "expected_source": "troubleshooting\\authentication-sso.md"
+  },
+  {
+    "name": "CloudSync file sync failure",
+    "ticket": {
+      "subject": "Users are unable to sync files",
+      "body": "Our users are unable to sync files through CloudSync."
+    },
+    "category": "Technical",
+    "urgency": "P2",
+    "expected_source": "products\\cloudsync.md"
+  },
+  {
+    "name": "Business plan pricing",
+    "ticket": {
+      "subject": "How much does the Business plan cost?",
+      "body": "Please provide pricing information for the Business plan."
+    },
+    "category": "Billing",
+    "urgency": "P4",
+    "expected_source": "billing\\billing-and-plans.md"
+  },
+  {
+    "name": "Workflow approval stuck",
+    "ticket": {
+      "subject": "WorkflowEngine approval is stuck",
+      "body": "An approval in WorkflowEngine has been stuck and is not progressing."
+    },
+    "category": "Technical",
+    "urgency": "P2",
+    "expected_source": "products\\workflowengine.md"
+  },
+  {
+    "name": "DataBridge ingestion failure",
+    "ticket": {
+      "subject": "DataBridge Pro ingestion is failing",
+      "body": "Our DataBridge Pro ingestion pipeline is failing and new data is not being processed."
+    },
+    "category": "Technical",
+    "urgency": "P2",
+    "expected_source": "products\\databridge-pro.md"
+  },
+  {
+    "name": "Ambiguous support request",
+    "ticket": {
+      "subject": "Something is not working",
+      "body": "The system is not working properly. Please help."
+    },
+    "category": "Technical",
+    "urgency": "P4"
+  }
+]
