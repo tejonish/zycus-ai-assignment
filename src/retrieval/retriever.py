@@ -260,7 +260,7 @@ class KBRetriever:
             self.documents
         ):
 
-            source = document["source"].lower()
+            source = document["source"].lower().replace("\\", "/")
             section = document["section"].lower()
             text = document["text"].lower()
 
@@ -277,8 +277,8 @@ class KBRetriever:
 
                     adjusted_scores[index] += 0.12
 
-                elif source.startswith(
-                    "products\\"
+                if source.startswith(
+                    "products/"
                 ):
 
                     # Penalize a different product.
@@ -368,7 +368,7 @@ class KBRetriever:
             if is_billing:
 
                 if source.startswith(
-                    "billing\\"
+                    "billing/"
                 ):
 
                     adjusted_scores[index] += 0.10
